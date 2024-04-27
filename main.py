@@ -27,7 +27,7 @@ async def t_ru(ctx):
     button.callback = ticketfunction_ru
     v = View(timeout=None).add_item(button)
     embed = discord.Embed(title="✉️ Тех.Поддержка ✉️", description="## По вопросам покупки/уточнения вопросов создайте тикет ")
-    embed.set_thumbnail(url="") # НЕ ЗАБЫТЬ ПОСТАВИТЬ ИКОНКУ
+    embed.set_thumbnail(url="https://cdn-icons-png.freepik.com/512/785/785530.png?ga=GA1.1.1544554669.1711359609") 
     await ctx.send(embed=embed, view=v)
 
 async def ticketfunction_ru(interaction: discord.Interaction):
