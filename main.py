@@ -1,10 +1,10 @@
 import discord
 from discord.ext import commands
 from discord.ui import Button, View
-import sqlite3
 
 import config as config
 
+import asyncio
 # try:
 #     conn = sqlite3.connect("ticket.db")
 #     conn.cursor().execute("CREATE TABLE IF NOT EXISTS ticket (openticket INT)")
@@ -12,7 +12,8 @@ import config as config
 # except:
 #     pass
 
-client = commands.Bot(command_prefix="!", intents=discord.Intents.all())
+intents = discord.Intents().all()
+client = commands.Bot(command_prefix="!", intents=intents)
 
 @client.event
 async def on_ready():
@@ -21,6 +22,7 @@ async def on_ready():
 @client.command()
 @commands.has_permissions(administrator=True)
 async def t_ru(ctx):
+    await ctx.message.delete()
     button = Button(label="Создать тикет в тех.поддержку 📨", style=discord.ButtonStyle.green)
     button.callback = ticketfunction_ru
     v = View(timeout=None).add_item(button)
@@ -30,7 +32,7 @@ async def t_ru(ctx):
 
 async def ticketfunction_ru(interaction: discord.Interaction):
     guild = interaction.guild
-    role = config.ticket_role 
+    role = guild.get_role(config.ticket_role)
     dio = {
         guild.default_role: discord.PermissionOverwrite(view_channel=False),
         interaction.user: discord.PermissionOverwrite(view_channel=True),
@@ -46,23 +48,24 @@ async def ticketfunction_ru(interaction: discord.Interaction):
     channel = await interaction.guild.create_text_channel(name=f"{interaction.user.name}-ticket", overwrites=dio, category=category)
     ticketcreate = discord.Embed(title="🆘 Ваш тикет 🆘", description=f"Задайте вопрос по покупке или тех.части. В скором времени мы вам ответим")
     await channel.send(embed=ticketcreate, view=v)
-    await interaction.response.send_message(f"**Ваш тикет создан -->** {channel.mention}", ephemeral=True)
-    conn.cursor().execute("INSERT INTO ticket (openticket) VALUES (?)", [interaction.user.id])
-    conn.commit() 
+    await interaction.response.send_message(f"**Ваш тикет создан -->** {channel.mention}", ephemeral=True, delete_after=30)
+    #conn.cursor().execute("INSERT INTO ticket (openticket) VALUES (?)", [interaction.user.id])
+    #conn.commit() 
 
 @client.command()
 @commands.has_permissions(administrator=True)
 async def t_eu(ctx):
+    await ctx.message.delete()
     button = Button(label="Create a ticket to tech support 📨", style=discord.ButtonStyle.green)
     button.callback = ticketfunction_eu
     v = View(timeout=None).add_item(button)
     embed = discord.Embed(title="✉️ Tech Support ✉️", description="## For purchase/clarification questions, create a ticket")
-    embed.set_thumbnail(url="") # НЕ ЗАБЫТЬ ПОСТАВИТЬ ИКОНКУ
+    embed.set_thumbnail(url='https://cdn-icons-png.freepik.com/512/785/785530.png?ga=GA1.1.1544554669.1711359609') # НЕ ЗАБЫТЬ ПОСТАВИТЬ ИКОНКУ
     await ctx.send(embed=embed, view=v)
 
 async def ticketfunction_eu(interaction: discord.Interaction):
     guild = interaction.guild
-    role = config.ticket_role 
+    role = guild.get_role(config.ticket_role)
     dio = {
         guild.default_role: discord.PermissionOverwrite(view_channel=False),
         interaction.user: discord.PermissionOverwrite(view_channel=True),
@@ -78,14 +81,29 @@ async def ticketfunction_eu(interaction: discord.Interaction):
     channel = await interaction.guild.create_text_channel(name=f"{interaction.user.name}-ticket", overwrites=dio, category=category)
     ticketcreate = discord.Embed(title="🆘 Your ticket 🆘", description=f"Ask us a question about your purchase or maintenance. We will get back to you shortly")
     await channel.send(embed=ticketcreate, view=v)
-    await interaction.response.send_message(f"**Your ticket has been created -->** {channel.mention}", ephemeral=True)
-    conn.cursor().execute("INSERT INTO ticket (openticket) VALUES (?)", [interaction.user.id])
-    conn.commit() 
+    await interaction.response.send_message(f"**Your ticket has been created -->** {channel.mention}", ephemeral=True, delete_after=30)
+    # conn.cursor().execute("INSERT INTO ticket (openticket) VALUES (?)", [interaction.user.id])
+    # conn.commit() 
 
 
 async def close_ticket(interaction: discord.Interaction):
-    if interaction.user.get_role(config.ticket_close_role): # id dei ruoli
+     
+    guild = interaction.guild
+    ls = []
+    for i in config.ticket_close_role:
+        ls.append(guild.get_role(i))
+    if any(role in interaction.user.roles for role in ls):
+        await interaction.response.send_message(f"**This channel will close automatic in 30 seconds ** ", ephemeral=True, delete_after=30)
+        await asyncio.sleep(30)
         await interaction.channel.delete()
+    if guild.get_role(1181541370851237920) in interaction.user.roles:
+        await interaction.response.send_message(f"**This channel will close automatic in 30 seconds ** ", ephemeral=True, delete_after=30)
+        await asyncio.sleep(30)
+        await interaction.channel.delete()
+    # if config.ticket_role in interaction.user.roles:
+    #     await interaction.channel.delete()
+    #     print('Роль продавца')
+        
         
 # async def reset_db():
 #     for a, in conn.cursor().execute("SELECT openticket FROM ticket").fetchall():
@@ -151,6 +169,7 @@ class Feedback(discord.ui.Modal, title='Feedback'):
 @client.command()
 @commands.has_permissions(administrator=True)
 async def feedback(ctx):
+    await ctx.message.delete()
     button = Button(label="Оставить отзыв 💌", style=discord.ButtonStyle.primary)
     button.callback = modal_callback
     v = View(timeout=None).add_item(button)
@@ -209,6 +228,7 @@ class Feedback_eu(discord.ui.Modal, title='Feedback'):
 @client.command()
 @commands.has_permissions(administrator=True)
 async def feedback_eu(ctx):
+    await ctx.message.delete()
     button = Button(label="Leave feedback 💌", style=discord.ButtonStyle.primary)
     button.callback = modal_callback_eu
     v = View(timeout=None).add_item(button)
@@ -220,3 +240,5 @@ async def modal_callback_eu(interaction: discord.Interaction):
     await interaction.response.send_modal(Feedback_eu())
 
 client.run(config.TOKEN)
+
+
