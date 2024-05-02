@@ -17,6 +17,8 @@ client = commands.Bot(command_prefix="!", intents=intents)
 
 @client.event
 async def on_ready():
+    print('Updating...')
+    await update(None)
     print("Bot online")
 
 @client.command()
@@ -168,7 +170,7 @@ class Feedback(discord.ui.Modal, title='Feedback'):
 
 @client.command()
 @commands.has_permissions(administrator=True)
-async def feedback(ctx):
+async def feedback_ru(ctx):
     await ctx.message.delete()
     button = Button(label="Оставить отзыв 💌", style=discord.ButtonStyle.primary)
     button.callback = modal_callback
@@ -238,6 +240,28 @@ async def feedback_eu(ctx):
 
 async def modal_callback_eu(interaction: discord.Interaction):
     await interaction.response.send_modal(Feedback_eu())
+
+@client.command()
+@commands.has_permissions(administrator=True)
+async def update(ctx):
+    try:
+        ctx.message.delete()
+    except:
+        pass
+    target_channels = [1233849532413116446,1233550117035053096,1233674956941037639,1233674737054646322] # ID of the target channel
+    command_channel = {1233849532413116446:'t_ru',
+                       1233550117035053096:'t_eu',
+                       1233674956941037639:'feedback_eu',
+                       1233674737054646322:'feedback_ru'
+                       }
+    for i in target_channels:
+        target_channel = client.get_channel(i)
+        await target_channel.purge()
+        message = await target_channel.send('Updating ...', delete_after = 10)
+        context = await client.get_context(message)
+        await context.invoke(client.get_command(command_channel[i]))
+    print('Successfully updated')
+
 
 client.run(config.TOKEN)
 
