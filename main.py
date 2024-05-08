@@ -5,6 +5,7 @@ from discord.ui import Button, View
 import config as config
 
 import asyncio
+import os
 # try:
 #     conn = sqlite3.connect("ticket.db")
 #     conn.cursor().execute("CREATE TABLE IF NOT EXISTS ticket (openticket INT)")
@@ -15,11 +16,16 @@ import asyncio
 intents = discord.Intents().all()
 client = commands.Bot(command_prefix="!", intents=intents)
 
+
 @client.event
 async def on_ready():
     print('Updating...')
     await update(None)
+    await add_reactions(None)
+    print("Update Secsessfully")
+    
     print("Bot online")
+
 
 @client.command()
 @commands.has_permissions(administrator=True)
@@ -32,6 +38,7 @@ async def t_ru(ctx):
     embed.set_thumbnail(url="https://cdn-icons-png.freepik.com/512/785/785530.png?ga=GA1.1.1544554669.1711359609") 
     await ctx.send(embed=embed, view=v)
 
+
 async def ticketfunction_ru(interaction: discord.Interaction):
     guild = interaction.guild
     role = guild.get_role(config.ticket_role)
@@ -40,9 +47,6 @@ async def ticketfunction_ru(interaction: discord.Interaction):
         interaction.user: discord.PermissionOverwrite(view_channel=True),
         role: discord.PermissionOverwrite(view_channel=True)
     }
-    # if isOpen(interaction.user.id):
-    #     await interaction.response.send_message("Вы уже открыли билет, подождите 24 часа", ephemeral=True)
-    # else:
     closebtn = Button(label="Закрыть тикет 🔐", style=discord.ButtonStyle.red)
     closebtn.callback = close_ticket
     v = View(timeout=None).add_item(closebtn)
@@ -51,8 +55,6 @@ async def ticketfunction_ru(interaction: discord.Interaction):
     ticketcreate = discord.Embed(title="🆘 Ваш тикет 🆘", description=f"Задайте вопрос по покупке или тех.части. В скором времени мы вам ответим")
     await channel.send(embed=ticketcreate, view=v)
     await interaction.response.send_message(f"**Ваш тикет создан -->** {channel.mention}", ephemeral=True, delete_after=30)
-    #conn.cursor().execute("INSERT INTO ticket (openticket) VALUES (?)", [interaction.user.id])
-    #conn.commit() 
 
 @client.command()
 @commands.has_permissions(administrator=True)
@@ -62,7 +64,7 @@ async def t_eu(ctx):
     button.callback = ticketfunction_eu
     v = View(timeout=None).add_item(button)
     embed = discord.Embed(title="✉️ Tech Support ✉️", description="## For purchase/clarification questions, create a ticket")
-    embed.set_thumbnail(url='https://cdn-icons-png.freepik.com/512/785/785530.png?ga=GA1.1.1544554669.1711359609') # НЕ ЗАБЫТЬ ПОСТАВИТЬ ИКОНКУ
+    embed.set_thumbnail(url='https://cdn-icons-png.freepik.com/512/785/785530.png?ga=GA1.1.1544554669.1711359609')
     await ctx.send(embed=embed, view=v)
 
 async def ticketfunction_eu(interaction: discord.Interaction):
@@ -73,9 +75,6 @@ async def ticketfunction_eu(interaction: discord.Interaction):
         interaction.user: discord.PermissionOverwrite(view_channel=True),
         role: discord.PermissionOverwrite(view_channel=True)
     }
-    # if isOpen(interaction.user.id):
-    #     await interaction.response.send_message("Вы уже открыли билет, подождите 24 часа", ephemeral=True)
-    #else:
     closebtn = Button(label="Close the ticket 🔐", style=discord.ButtonStyle.red)
     closebtn.callback = close_ticket
     v = View(timeout=None).add_item(closebtn)
@@ -94,33 +93,16 @@ async def close_ticket(interaction: discord.Interaction):
     ls = []
     for i in config.ticket_close_role:
         ls.append(guild.get_role(i))
+
     if any(role in interaction.user.roles for role in ls):
         await interaction.response.send_message(f"**This channel will close automatic in 30 seconds ** ", ephemeral=True, delete_after=30)
         await asyncio.sleep(30)
         await interaction.channel.delete()
+
     if guild.get_role(1181541370851237920) in interaction.user.roles:
         await interaction.response.send_message(f"**This channel will close automatic in 30 seconds ** ", ephemeral=True, delete_after=30)
         await asyncio.sleep(30)
         await interaction.channel.delete()
-    # if config.ticket_role in interaction.user.roles:
-    #     await interaction.channel.delete()
-    #     print('Роль продавца')
-        
-        
-# async def reset_db():
-#     for a, in conn.cursor().execute("SELECT openticket FROM ticket").fetchall():
-#         try:
-#             conn.cursor().execute("DELETE FROM ticket WHERE openticket = ?", [a])
-#             conn.commit()
-#         except:
-#             pass
-
-# def isOpen(user_id: int):
-#     result = conn.cursor().execute("SELECT openticket FROM ticket WHERE openticket = ?", [user_id])
-#     if len(result.fetchall()) > 0:
-#         return True
-#     else:
-#         return False
 
 
 
@@ -200,7 +182,7 @@ class Feedback_eu(discord.ui.Modal, title='Feedback'):
         max_length=300,
     )
 
-    async def on_submit(self, interaction: discord.Interaction):
+    async def on_submit(self,interaction: discord.Interaction):
         await interaction.response.send_message(f'Thanks for your feedback', ephemeral=True, delete_after = 30)
         embed_color = discord.Color.green()
         try:
@@ -223,7 +205,7 @@ class Feedback_eu(discord.ui.Modal, title='Feedback'):
         embed.add_field(name='Отзыв', value=f"{self.feedback.value}", inline=False)
         channel = client.get_channel(config.feedback_chanel_id)
         await channel.send(embed=embed)
-    async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
+    async def on_error(interaction: discord.Interaction, error: Exception) -> None:
         await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
 
         # Make sure we know what the error actually is
@@ -257,12 +239,62 @@ async def update(ctx):
     for i in target_channels:
         target_channel = client.get_channel(i)
         await target_channel.purge()
-        message = await target_channel.send('Updating ...', delete_after = 10)
+        message = await target_channel.send('Upd-ating ...', delete_after = 10)
         context = await client.get_context(message)
         await context.invoke(client.get_command(command_channel[i]))
     print('Successfully updated')
 
 
+@client.event
+async def on_raw_reaction_add(payload):
+        if payload.message_id == config.ID_POST:
+            channel = client.get_channel(payload.channel_id)
+            message = await channel.fetch_message(payload.message_id)
+            user = discord.utils.get(message.guild.members, id=payload.user_id)
+            emoji = str(payload.emoji)
+
+            if user.bot:
+                return
+
+            try:
+                role = discord.utils.get(message.guild.roles, id=config.ROLES_LIST[emoji])
+
+                if len([i for i in user.roles if i.id not in config.USER_ROLES_LIST]) <= config.MAX_ROLES:
+                    await user.add_roles(role)
+                else:
+                    await message.remove_reaction(payload.emoji, user)
+
+            except Exception as _ex:
+                print(repr(_ex))
+
+@client.event
+async def on_raw_reaction_remove(payload):
+    channel = client.get_channel(payload.channel_id)
+    message = await channel.fetch_message(payload.message_id)
+    user = discord.utils.get(message.guild.members, id=payload.user_id)
+
+    try:
+        emoji = str(payload.emoji)
+        role = discord.utils.get(message.guild.roles, id=config.ROLES_LIST[emoji])
+        await user.remove_roles(role)
+    except Exception as _ex:
+        print(repr(_ex))
+
+@client.command()
+@commands.has_permissions(administrator=True)
+async def add_reactions(ctx):
+    try:
+        ctx.message.delete()
+    except:
+        pass
+    # Получаем объект сообщения по его идентификатору
+    channel = client.get_channel(config.CHANNEL_FOR_ROLES_ID) # Канал, в котором находится сообщение
+    message_id = 1237735977515094056  # Идентификатор сообщения
+    message = await channel.fetch_message(message_id)
+
+    # Ставим реакции под сообщением
+    
+    await message.add_reaction('🇷🇺')
+    await message.add_reaction('🇪🇺')
+
 client.run(config.TOKEN)
-
-
