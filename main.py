@@ -6,12 +6,6 @@ import config as config
 
 import asyncio
 import os
-# try:
-#     conn = sqlite3.connect("ticket.db")
-#     conn.cursor().execute("CREATE TABLE IF NOT EXISTS ticket (openticket INT)")
-#     conn.commit()
-# except:
-#     pass
 
 intents = discord.Intents().all()
 client = commands.Bot(command_prefix="!", intents=intents)
@@ -20,22 +14,27 @@ client = commands.Bot(command_prefix="!", intents=intents)
 @client.event
 async def on_ready():
     print('Updating...')
-    await update(None)
+    await update(None) # функция для обновления системы тикетов и фидбэка
     await add_reactions(None)
-    print("Update Secsessfully")
-    
+    print("Update successfully")
     print("Bot online")
 
 
 @client.command()
 @commands.has_permissions(administrator=True)
 async def t_ru(ctx):
+
     await ctx.message.delete()
+
     button = Button(label="Создать тикет в тех.поддержку 📨", style=discord.ButtonStyle.green)
+
     button.callback = ticketfunction_ru
     v = View(timeout=None).add_item(button)
-    embed = discord.Embed(title="✉️ Тех.Поддержка ✉️", description="## По вопросам покупки/уточнения вопросов создайте тикет ")
-    embed.set_thumbnail(url="https://cdn-icons-png.freepik.com/512/785/785530.png?ga=GA1.1.1544554669.1711359609") 
+
+    embed = discord.Embed(title="✉️ Добро пожаловать в канал тикетов. ✉️", description="## Если у вас есть вопросы или пожелания, пожалуйста, нажмите на кнопку "Создать заказ"! ")
+
+    embed.set_thumbnail(url="https://imgur.com/u3BG2eV") 
+
     await ctx.send(embed=embed, view=v)
 
 
@@ -47,13 +46,20 @@ async def ticketfunction_ru(interaction: discord.Interaction):
         interaction.user: discord.PermissionOverwrite(view_channel=True),
         role: discord.PermissionOverwrite(view_channel=True)
     }
+    
     closebtn = Button(label="Закрыть тикет 🔐", style=discord.ButtonStyle.red)
     closebtn.callback = close_ticket
+   
     v = View(timeout=None).add_item(closebtn)
+   
     category = interaction.guild.get_channel(config.ticket_category_id)
+    
     channel = await interaction.guild.create_text_channel(name=f"{interaction.user.name}-ticket", overwrites=dio, category=category)
+
     ticketcreate = discord.Embed(title="🆘 Ваш тикет 🆘", description=f"Задайте вопрос по покупке или тех.части. В скором времени мы вам ответим")
+
     await channel.send(embed=ticketcreate, view=v)
+
     await interaction.response.send_message(f"**Ваш тикет создан -->** {channel.mention}", ephemeral=True, delete_after=30)
 
 @client.command()
@@ -63,8 +69,8 @@ async def t_eu(ctx):
     button = Button(label="Create a ticket to tech support 📨", style=discord.ButtonStyle.green)
     button.callback = ticketfunction_eu
     v = View(timeout=None).add_item(button)
-    embed = discord.Embed(title="✉️ Tech Support ✉️", description="## For purchase/clarification questions, create a ticket")
-    embed.set_thumbnail(url='https://cdn-icons-png.freepik.com/512/785/785530.png?ga=GA1.1.1544554669.1711359609')
+    embed = discord.Embed(title="✉️ Welcome to the ticket channel. ✉️", description="## If you have any questions or requests, please click on the "Create Order" button!")
+    embed.set_thumbnail(url='https://imgur.com/u3BG2eV')
     await ctx.send(embed=embed, view=v)
 
 async def ticketfunction_eu(interaction: discord.Interaction):
@@ -123,7 +129,6 @@ class Feedback(discord.ui.Modal, title='Feedback'):
     )
 
     async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.send_message(f'Спасибо за отзыв', ephemeral=True, delete_after = 30)
         embed_color = discord.Color.green()
         try:
             number = int(self.name.value)
@@ -145,6 +150,8 @@ class Feedback(discord.ui.Modal, title='Feedback'):
         embed.add_field(name='Отзыв', value=f"{self.feedback.value}", inline=False)
         channel = client.get_channel(config.feedback_chanel_id)
         await channel.send(embed=embed)
+        await interaction.response.send_message(f'Спасибо за отзыв', ephemeral=True, delete_after = 30)
+
     async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
         await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
 
@@ -183,7 +190,6 @@ class Feedback_eu(discord.ui.Modal, title='Feedback'):
     )
 
     async def on_submit(self,interaction: discord.Interaction):
-        await interaction.response.send_message(f'Thanks for your feedback', ephemeral=True, delete_after = 30)
         embed_color = discord.Color.green()
         try:
             number = int(self.name.value)
@@ -205,6 +211,8 @@ class Feedback_eu(discord.ui.Modal, title='Feedback'):
         embed.add_field(name='Отзыв', value=f"{self.feedback.value}", inline=False)
         channel = client.get_channel(config.feedback_chanel_id)
         await channel.send(embed=embed)
+        await interaction.response.send_message(f'Thanks for your feedback', ephemeral=True, delete_after = 30)
+
     async def on_error(interaction: discord.Interaction, error: Exception) -> None:
         await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
 
@@ -296,5 +304,73 @@ async def add_reactions(ctx):
     
     await message.add_reaction('🇷🇺')
     await message.add_reaction('🇪🇺')
+
+@client.command()
+@commands.has_permissions(administrator=True)
+async def embed(ctx):
+    
+    await ctx.message.delete()
+    button = Button(label="Отправить Embed 📯 ", style=discord.ButtonStyle.green)
+    button.callback = modal_embed_callback
+    button1 = Button(label="Подобрать цвет", style=discord.ButtonStyle.secondary, url='https://www.spycolor.com/')
+
+    v = View(timeout=None).add_item(button)
+    v.add_item(button1)
+    
+    embed = discord.Embed(title="Отправка Embed📡", description=" ## Нажмите на кнопку для отправки Ембеда в новости", color=discord.Color.random())
+
+    await ctx.send(embed=embed, view=v)
+
+async def modal_embed_callback(interaction: discord.Interaction):
+    await interaction.response.send_modal(EmbedModal())
+
+class EmbedModal(discord.ui.Modal, title='Embed'):
+    
+    titile = discord.ui.TextInput(
+        label='Заголовок',
+        placeholder='...',
+        required=False
+    )
+    
+    color = discord.ui.TextInput(
+        label='Цвет',
+        placeholder='rgb(<number>, <number>, <number>)',
+        required=False
+    )
+
+    image_url = discord.ui.TextInput(
+        label='Url картинки',
+        placeholder='https://imgur.com/a/3do0u8t',
+        required=False
+    )
+
+    main_text = discord.ui.TextInput(
+        label='Основной текст',
+        style=discord.TextStyle.long,
+        placeholder='Type your feedback here...',
+        max_length=4000
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        
+        if self.color.value != '':
+            embed_color = discord.Color.from_str(self.color.value)
+        else:
+            embed_color = discord.Color.random()
+            
+        embed = discord.Embed(title= self.titile.value, description=self.main_text, color=embed_color)
+        
+        if self.image_url.value is not None:
+            embed.set_image(url=self.image_url.value)
+        embed.set_thumbnail(url="https://i.imgur.com/u3BG2eV.png")
+        channel = client.get_channel(1183367937957048440)
+        
+        await channel.send(embed=embed)
+        await interaction.response.send_message('Embed Успешно создан',ephemeral=True, delete_after = 30,)
+
+    async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
+        await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
+
+
 
 client.run(config.TOKEN)
