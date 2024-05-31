@@ -26,14 +26,14 @@ async def t_ru(ctx):
 
     await ctx.message.delete()
 
-    button = Button(label="Создать тикет в тех.поддержку 📨", style=discord.ButtonStyle.green)
+    button = Button(label="Создать заказ 📨", style=discord.ButtonStyle.green)
 
     button.callback = ticketfunction_ru
     v = View(timeout=None).add_item(button)
 
-    embed = discord.Embed(title="✉️ Добро пожаловать в канал тикетов. ✉️", description="## Если у вас есть вопросы или пожелания, пожалуйста, нажмите на кнопку "Создать заказ"! ")
+    embed = discord.Embed(title="Добро пожаловать в канал тикетов ✉️", description="Если у вас есть вопросы или пожелания, пожалуйста, нажмите на кнопку \"Создать заказ\".")
 
-    embed.set_thumbnail(url="https://imgur.com/u3BG2eV") 
+    embed.set_thumbnail(url="https://i.imgur.com/u3BG2eV.png") 
 
     await ctx.send(embed=embed, view=v)
 
@@ -56,7 +56,7 @@ async def ticketfunction_ru(interaction: discord.Interaction):
     
     channel = await interaction.guild.create_text_channel(name=f"{interaction.user.name}-ticket", overwrites=dio, category=category)
 
-    ticketcreate = discord.Embed(title="🆘 Ваш тикет 🆘", description=f"Задайте вопрос по покупке или тех.части. В скором времени мы вам ответим")
+    ticketcreate = discord.Embed(title="🆘 Ваш тикет 🆘", description=f"Задайте вопрос по покупке в тикете. В скором времени вам ответят")
 
     await channel.send(embed=ticketcreate, view=v)
 
@@ -66,11 +66,11 @@ async def ticketfunction_ru(interaction: discord.Interaction):
 @commands.has_permissions(administrator=True)
 async def t_eu(ctx):
     await ctx.message.delete()
-    button = Button(label="Create a ticket to tech support 📨", style=discord.ButtonStyle.green)
+    button = Button(label="Create Order 📨", style=discord.ButtonStyle.green)
     button.callback = ticketfunction_eu
     v = View(timeout=None).add_item(button)
-    embed = discord.Embed(title="✉️ Welcome to the ticket channel. ✉️", description="## If you have any questions or requests, please click on the "Create Order" button!")
-    embed.set_thumbnail(url='https://imgur.com/u3BG2eV')
+    embed = discord.Embed(title="Welcome to the ticket channel. ✉️", description="If you have any questions or requests, please click on the \"Create Order\" button!")
+    embed.set_thumbnail(url="https://i.imgur.com/u3BG2eV.png") 
     await ctx.send(embed=embed, view=v)
 
 async def ticketfunction_eu(interaction: discord.Interaction):
@@ -86,7 +86,7 @@ async def ticketfunction_eu(interaction: discord.Interaction):
     v = View(timeout=None).add_item(closebtn)
     category = interaction.guild.get_channel(config.ticket_category_id)
     channel = await interaction.guild.create_text_channel(name=f"{interaction.user.name}-ticket", overwrites=dio, category=category)
-    ticketcreate = discord.Embed(title="🆘 Your ticket 🆘", description=f"Ask us a question about your purchase or maintenance. We will get back to you shortly")
+    ticketcreate = discord.Embed(title="🆘 Your ticket 🆘", description=f"Ask a question about your purchase in the ticket. You will receive a reply shortly")
     await channel.send(embed=ticketcreate, view=v)
     await interaction.response.send_message(f"**Your ticket has been created -->** {channel.mention}", ephemeral=True, delete_after=30)
     # conn.cursor().execute("INSERT INTO ticket (openticket) VALUES (?)", [interaction.user.id])
@@ -101,12 +101,12 @@ async def close_ticket(interaction: discord.Interaction):
         ls.append(guild.get_role(i))
 
     if any(role in interaction.user.roles for role in ls):
-        await interaction.response.send_message(f"**This channel will close automatic in 30 seconds ** ", ephemeral=True, delete_after=30)
+        await interaction.response.send_message(f"**Этот канал автоматически удалится через 30 секунд ** ", ephemeral=True, delete_after=30)
         await asyncio.sleep(30)
         await interaction.channel.delete()
 
     if guild.get_role(1181541370851237920) in interaction.user.roles:
-        await interaction.response.send_message(f"**This channel will close automatic in 30 seconds ** ", ephemeral=True, delete_after=30)
+        await interaction.response.send_message(f"**Этот канал автоматически удалится через 30 секунд ** ", ephemeral=True, delete_after=30)
         await asyncio.sleep(30)
         await interaction.channel.delete()
 
@@ -115,7 +115,7 @@ async def close_ticket(interaction: discord.Interaction):
 class Feedback(discord.ui.Modal, title='Feedback'):
     
     name = discord.ui.TextInput(
-        label='Оценка 1-5⭐️',
+        label='Оценка работы от 1 до 5 ⭐️',
         placeholder='1-5',
         max_length=1
     )
@@ -123,7 +123,7 @@ class Feedback(discord.ui.Modal, title='Feedback'):
     feedback = discord.ui.TextInput(
         label='Напишите отзыв',
         style=discord.TextStyle.long,
-        placeholder='Type your feedback here...',
+        placeholder='Обязательно оставьте свой комментарий',
         required=False,
         max_length=300,
     )
@@ -164,8 +164,8 @@ async def feedback_ru(ctx):
     button = Button(label="Оставить отзыв 💌", style=discord.ButtonStyle.primary)
     button.callback = modal_callback
     v = View(timeout=None).add_item(button)
-    embed = discord.Embed(title="Отзывы", description="Хотите оценить роботу магазина или продовца? Оставте отзыв💌")
-    embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/4658/4658943.png")
+    embed = discord.Embed(title="Отзывы", description="Хотите оценить работу или дизайнера? Оставьте отзыв 💌")
+    embed.set_thumbnail(url="https://i.imgur.com/u3BG2eV.png") 
     await ctx.send(embed=embed, view=v)
 
 async def modal_callback(interaction: discord.Interaction):
@@ -176,7 +176,7 @@ async def modal_callback(interaction: discord.Interaction):
 class Feedback_eu(discord.ui.Modal, title='Feedback'):
     
     name = discord.ui.TextInput(
-        label='Rating 1-5⭐️',
+        label='Performance evaluation from 1 to 5 ⭐️',
         placeholder='1-5',
         max_length=1
     )
@@ -184,7 +184,7 @@ class Feedback_eu(discord.ui.Modal, title='Feedback'):
     feedback = discord.ui.TextInput(
         label='Write a review',
         style=discord.TextStyle.long,
-        placeholder='Type your feedback here...',
+        placeholder='Be sure to leave a comment',
         required=False,
         max_length=300,
     )
@@ -224,8 +224,8 @@ async def feedback_eu(ctx):
     button = Button(label="Leave feedback 💌", style=discord.ButtonStyle.primary)
     button.callback = modal_callback_eu
     v = View(timeout=None).add_item(button)
-    embed = discord.Embed(title="Feedback", description="Do you want to evaluate the work of a store or seller? Leave a review💌")
-    embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/4658/4658943.png")
+    embed = discord.Embed(title="Feedback", description="Want to rate a job or designer? Leave a review 💌")
+    embed.set_thumbnail(url="https://i.imgur.com/u3BG2eV.png")
     await ctx.send(embed=embed, view=v)
 
 async def modal_callback_eu(interaction: discord.Interaction):
@@ -238,11 +238,12 @@ async def update(ctx):
         ctx.message.delete()
     except:
         pass
-    target_channels = [1233849532413116446,1233550117035053096,1233674956941037639,1233674737054646322] # ID of the target channel
+    target_channels = [1233849532413116446,1233550117035053096,1233674956941037639,1233674737054646322,1190696739620012072] # ID of the target channel
     command_channel = {1233849532413116446:'t_ru',
                        1233550117035053096:'t_eu',
                        1233674956941037639:'feedback_eu',
-                       1233674737054646322:'feedback_ru'
+                       1233674737054646322:'feedback_ru',
+                       1190696739620012072:'embed'
                        }
     for i in target_channels:
         target_channel = client.get_channel(i)
@@ -297,7 +298,7 @@ async def add_reactions(ctx):
         pass
     # Получаем объект сообщения по его идентификатору
     channel = client.get_channel(config.CHANNEL_FOR_ROLES_ID) # Канал, в котором находится сообщение
-    message_id = 1237735977515094056  # Идентификатор сообщения
+    message_id = 1238128242695602236  # Идентификатор сообщения
     message = await channel.fetch_message(message_id)
 
     # Ставим реакции под сообщением
@@ -365,11 +366,8 @@ class EmbedModal(discord.ui.Modal, title='Embed'):
         embed.set_thumbnail(url="https://i.imgur.com/u3BG2eV.png")
         channel = client.get_channel(1183367937957048440)
         
-        await channel.send(embed=embed)
+        await channel.send(content='@everyone', embed=embed)
         await interaction.response.send_message('Embed Успешно создан',ephemeral=True, delete_after = 30,)
-
-    async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
-        await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
 
 
 
