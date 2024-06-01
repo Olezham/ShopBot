@@ -6,11 +6,11 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-7 col-lg-6">
-            <form class="needs-validation" novalidate="">
+            <form class="needs-validation" novalidate="" method="post" enctype="multipart/form-data">
                 <div class="row g-3">
                     <div class="col-12">
                         <label for="title" class="form-label">Title</label>
-                        <input type="text" class="form-control" id="title" placeholder="Фотошоп" required="">
+                        <input type="text" class="form-control" id="title" placeholder="Фотошоп" name='title' required="">
                         <div class="invalid-feedback">
                             Title is required.
                         </div>
@@ -18,7 +18,7 @@
 
                     <div class="col-12">
                         <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control" id="description" placeholder="Супер пупер обработка фото" required=""></textarea>
+                        <textarea class="form-control" id="description" placeholder="Супер пупер обработка фото" name='description' required=""></textarea>
                         <div class="invalid-feedback">
                             Description is required.
                         </div>
@@ -26,7 +26,7 @@
 
                     <div class="col-12">
                         <label for="price" class="form-label">Price in USD</label>
-                        <input type="text" class="form-control" id="price" placeholder="100" required="">
+                        <input type="text" class="form-control" id="price" placeholder="100" name='price' required="">
                         <div class="invalid-feedback">
                             Price is required.
                         </div>
@@ -35,7 +35,7 @@
                     <div class="col-12">
                         <div class="mb-3">
                             <label for="formFile" class="form-label">Image</label>
-                            <input class="form-control" type="file" id="formFile">
+                            <input class="form-control" type="file" id="formFile" name="formFile">
                           </div>
                     </div>
                 </div>

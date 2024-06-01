@@ -11,8 +11,8 @@ def generate_uid():
 def index():
 	return render_template('index.html')
 
-@app.route('/add-article', methods=['GET', 'POST'])
-def add_article():
+@app.route('/add-article-page', methods=['GET', 'POST'])
+def add_article_page():
     if request.method == 'POST':
         title = request.form['title']
         description = request.form['description']
