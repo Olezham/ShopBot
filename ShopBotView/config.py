@@ -1,4 +1,4 @@
-host = 'eu01-sql.pebblehost.com'
-username = 'customer_720687_sacle'
-password = 'ptp!zRw7s4nb!Q7N2!De'
-db = 'customer_720687_sacle'
+host = 'xq1uq6vmz.mysql.pythonanywhere-services.com'
+username = 'xq1uq6vmz'
+password = 'K-dB"8%n3U8cAu]'
+db = 'xq1uq6vmz$default'
